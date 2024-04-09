@@ -1,53 +1,53 @@
 import unittest
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import *
 
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html(self):
-        node = HTMLNode(tag="a", props={"href": "https://www.google.com", "target": "_blank"})
+        node = create_html_node(tag="a", props={"href": "https://www.google.com", "target": "_blank"})
         expected_props_html = ' href="https://www.google.com" target="_blank"'
-        self.assertEqual(node.props_to_html(), expected_props_html)
+        self.assertEqual(transform_props_to_html(node), expected_props_html)
 
-        node2 = HTMLNode(tag="p")
-        self.assertEqual(node2.props_to_html(), "")
+        node2 = create_html_node(tag="p")
+        self.assertEqual(transform_props_to_html(node2), "")
 
 
 class TestLeafNode(unittest.TestCase):
     def test_render_no_tag(self):
-        node = LeafNode(value="This is a paragraph of text.")
-        self.assertEqual(node.to_html(), "This is a paragraph of text.")
+        node = create_leaf_node(value="This is a paragraph of text.")
+        self.assertEqual(transform_leaf_node_to_html(node), "This is a paragraph of text.")
 
     def test_render_with_tag(self):
-        node = LeafNode(tag="p", value="This is a paragraph of text.")
-        self.assertEqual(node.to_html(), "<p>This is a paragraph of text.</p>")
+        node = create_leaf_node(tag="p", value="This is a paragraph of text.")
+        self.assertEqual(transform_leaf_node_to_html(node), "<p>This is a paragraph of text.</p>")
 
     def test_render_with_tag_and_props(self):
-        node = LeafNode(tag="a", value="Click me!", props={"href": "https://www.google.com"})
-        self.assertEqual(node.to_html(), '<a href="https://www.google.com">Click me!</a>')
+        node = create_leaf_node(tag="a", value="Click me!", props={"href": "https://www.google.com"})
+        self.assertEqual(transform_leaf_node_to_html(node), '<a href="https://www.google.com">Click me!</a>')
 
     def test_value_required(self):
         with self.assertRaises(ValueError):
-            LeafNode()
+            create_leaf_node()
 
 
 class TestParentNode(unittest.TestCase):
     def test_render(self):
         children = [
-            LeafNode("b", "Bold text"),
-            LeafNode(None, "Normal text"),
-            LeafNode("i", "italic text"),
-            LeafNode(None, "Normal text"),
+            create_leaf_node("b", "Bold text"),
+            create_leaf_node(None, "Normal text"),
+            create_leaf_node("i", "italic text"),
+            create_leaf_node(None, "Normal text"),
         ]
-        node = ParentNode("p", children)
+        node = create_parent_node("p", children)
         expected_html = "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
-        self.assertEqual(node.to_html(), expected_html)
+        self.assertEqual(transform_parent_node_to_html(node), expected_html)
 
     def test_tag_required(self):
         with self.assertRaises(ValueError):
-            ParentNode()
+            create_parent_node()
 
     def test_children_required(self):
         with self.assertRaises(ValueError):
-            ParentNode("div")
+            create_parent_node("div")
 
 if __name__ == "__main__":
     unittest.main()
